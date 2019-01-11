@@ -44,7 +44,7 @@ class save_point {
     // internal transaction pointer
     transaction* m_transaction;
     // distinct name of the current save_pointS
-    std::string m_name;
+    intercept::types::r_string m_name;
 };
 
 typedef std::shared_ptr<save_point> save_point_ref;

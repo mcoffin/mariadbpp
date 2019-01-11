@@ -51,7 +51,7 @@ TEST_F(ParameterizedQueryTest, bindAnyDataType) {
     errorQuery = m_con->create_statement("UPDATE " + m_table_name + " SET " + name + "= ?;");     \
     call;                                                                                         \
     errorQuery->execute();                                                                        \
-    testQuery = m_con->create_statement("SELECT " + std::string(name) + " FROM " + m_table_name + \
+    testQuery = m_con->create_statement("SELECT " + intercept::types::r_string(name) + " FROM " + m_table_name + \
                                         " WHERE id = 1;");                                        \
     queryResult = testQuery->query();                                                             \
     ASSERT_TRUE(queryResult->next());                                                             \

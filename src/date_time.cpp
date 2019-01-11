@@ -65,7 +65,7 @@ date_time::date_time(const MYSQL_TIME& t) : time() {
     set(t.year, t.month, t.day, t.hour, t.minute, t.second, t.second_part / 1000);
 }
 
-date_time::date_time(const std::string& dt) : time() { set(dt); }
+date_time::date_time(const intercept::types::r_string& dt) : time() { set(static_cast<std::string>(dt)); }
 
 int date_time::compare(const date_time& dt) const {
     if (year() < dt.year()) return -1;
@@ -573,15 +573,15 @@ bool date_time::set(const std::string& dt) {
     throw std::invalid_argument("invalid date format");
 }
 
-const std::string date_time::str(bool with_millisecond) const {
+const intercept::types::r_string date_time::str(bool with_millisecond) const {
     std::stringstream stream;
     stream.fill('0');
 
     stream << str_date() << " " << time::str_time(with_millisecond);
-    return stream.str();
+    return intercept::types::r_string(stream.str());
 }
 
-const std::string date_time::str_date() const {
+const intercept::types::r_string date_time::str_date() const {
     std::stringstream stream;
     stream.fill('0');
 
@@ -592,7 +592,7 @@ const std::string date_time::str_date() const {
     */
     stream << std::setw(4) << year() << "-" << std::setw(2) << +month() << "-" << std::setw(2)
            << +day();
-    return stream.str();
+    return intercept::types::r_string(stream.str());
 }
 
 std::ostream& mariadb::operator<<(std::ostream& os, const date_time& dt) {

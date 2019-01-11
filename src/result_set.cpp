@@ -31,8 +31,10 @@ result_set::result_set(connection *connection)
     if (m_result_set) {
         m_field_count = mysql_num_fields(m_result_set);
         m_fields = mysql_fetch_fields(m_result_set);
+        m_affected_rows = mysql_affected_rows(connection->m_mysql);
+        m_last_insert_id =  mysql_insert_id(connection->m_mysql);
 
-        for (u32 i = 0; i < m_field_count; ++i) m_indexes[m_fields[i].name] = i;
+        for (u32 i = 0; i < m_field_count; ++i) m_indexes[intercept::types::r_string(m_fields[i].name)] = i;
     }
 }
 
@@ -53,6 +55,8 @@ result_set::result_set(const statement_data_ref &stmt_data)
         STMT_ERROR(stmt_data->m_statement)
     else {
         m_field_count = mysql_stmt_field_count(stmt_data->m_statement);
+        m_affected_rows = mysql_stmt_affected_rows(stmt_data->m_statement);
+        m_last_insert_id = mysql_stmt_insert_id(stmt_data->m_statement);
         m_result_set = mysql_stmt_result_metadata(stmt_data->m_statement);
 
         if (m_field_count > 0) {
@@ -61,7 +65,7 @@ result_set::result_set(const statement_data_ref &stmt_data)
             m_row = new char *[m_field_count];
 
             for (u32 i = 0; i < m_field_count; ++i) {
-                m_indexes[m_fields[i].name] = i;
+                m_indexes[intercept::types::r_string(m_fields[i].name)] = i;
                 m_binds.emplace_back(new bind(&m_raw_binds[i], &m_fields[i]));
                 m_row[i] = m_binds[i]->buffer();
             }
@@ -155,13 +159,13 @@ value::type result_set::column_type(u32 index) const {
     }
 }
 
-const std::string result_set::column_name(u32 index) {
+const intercept::types::r_string result_set::column_name(u32 index) {
     if (index >= m_field_count) throw std::out_of_range("Column index out of range");
 
-    return m_fields[index].name;
+    return std::string_view(m_fields[index].name, m_fields[index].name_length);
 }
 
-u32 result_set::column_index(const std::string &name) const {
+u32 result_set::column_index(const intercept::types::r_string &name) const {
     const map_indexes_t::const_iterator i = m_indexes.find(name);
 
     if (i == m_indexes.end()) return 0xffffffff;
@@ -289,96 +293,96 @@ MAKE_GETTER(data, data_ref, value::type::data)
     return len == 0 ? data_ref() : data_ref(new data<char>(m_row[index], len));
 }
 
-MAKE_GETTER(string, std::string, value::type::string)
-    return std::string(m_row[index], column_size(index));
+MAKE_GETTER(string, intercept::types::r_string, value::type::string)
+    return intercept::types::r_string(std::string_view(m_row[index], column_size(index)));
 }
 
 MAKE_GETTER(date, date_time, value::type::date)
     if (m_stmt_data) return mariadb::date_time(m_binds[index]->m_time);
 
-    return date_time(std::string(m_row[index], column_size(index))).date();
+    return date_time(intercept::types::r_string(std::string_view(m_row[index], column_size(index)))).date();
 }
 
 MAKE_GETTER(date_time, date_time, value::type::date_time)
     if (m_stmt_data) return mariadb::date_time(m_binds[index]->m_time);
 
-    return date_time(std::string(m_row[index], column_size(index)));
+    return date_time(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(time, mariadb::time, value::type::time)
     if (m_stmt_data) return mariadb::time(m_binds[index]->m_time);
 
-    return mariadb::time(std::string(m_row[index], column_size(index)));
+    return mariadb::time(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(decimal, decimal, value::type::decimal)
-    return decimal(std::string(m_row[index], column_size(index)));
+    return decimal(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(boolean, bool, value::type::boolean)
     if (m_stmt_data) return (m_binds[index]->m_uchar8[0] != 0);
 
-    return string_cast<bool>(std::string(m_row[index], column_size(index)));
+    return string_cast<bool>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(unsigned8, u8, value::type::unsigned8)
     if (m_stmt_data) return checked_cast<u8>(0x00000000000000ff & m_binds[index]->m_unsigned64);
 
-    return string_cast<u8>(std::string(m_row[index], column_size(index)));
+    return string_cast<u8>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(signed8, s8, value::type::signed8)
     if (m_stmt_data) return checked_cast<s8>(0x00000000000000ff & m_binds[index]->m_signed64);
 
-    return string_cast<s8>(std::string(m_row[index], column_size(index)));
+    return string_cast<s8>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(unsigned16, u16, value::type::unsigned16)
     if (m_stmt_data) return checked_cast<u16>(0x000000000000ffff & m_binds[index]->m_unsigned64);
 
-    return string_cast<u16>(std::string(m_row[index], column_size(index)));
+    return string_cast<u16>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(signed16, s16, value::type::signed16)
     if (m_stmt_data) return checked_cast<s16>(0x000000000000ffff & m_binds[index]->m_signed64);
 
-    return string_cast<s16>(std::string(m_row[index], column_size(index)));
+    return string_cast<s16>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(unsigned32, u32, value::type::unsigned32)
     if (m_stmt_data) return checked_cast<u32>(0x00000000ffffffff & m_binds[index]->m_unsigned64);
 
-    return string_cast<u32>(std::string(m_row[index], column_size(index)));
+    return string_cast<u32>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(signed32, s32, value::type::signed32)
     if (m_stmt_data) return m_binds[index]->m_signed32[0];
 
-    return string_cast<s32>(std::string(m_row[index], column_size(index)));
+    return string_cast<s32>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(unsigned64, u64, value::type::unsigned64)
     if (m_stmt_data) return m_binds[index]->m_unsigned64;
 
-    return string_cast<u64>(std::string(m_row[index], column_size(index)));
+    return string_cast<u64>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(signed64, s64, value::type::signed64)
     if (m_stmt_data) return m_binds[index]->m_signed64;
 
-    return string_cast<s64>(std::string(m_row[index], column_size(index)));
+    return string_cast<s64>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(float, f32, value::type::float32)
     if (m_stmt_data) return m_binds[index]->m_float32[0];
 
-    return string_cast<f32>(std::string(m_row[index], column_size(index)));
+    return string_cast<f32>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(double, f64, value::type::double64)
     if (m_stmt_data) return checked_cast<f64>(m_binds[index]->m_double64);
 
-    return string_cast<f64>(std::string(m_row[index], column_size(index)));
+    return string_cast<f64>(intercept::types::r_string(std::string_view(m_row[index], column_size(index))));
 }
 
 MAKE_GETTER(is_null, bool, value::type::null)

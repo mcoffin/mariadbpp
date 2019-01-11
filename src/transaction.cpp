@@ -11,24 +11,26 @@
 #include <mysql.h>
 #include <mariadb++/connection.hpp>
 #include <mariadb++/transaction.hpp>
-
+using namespace std::string_view_literals;
 using namespace mariadb;
 
 namespace {
-const char* g_isolation_level[] = {
-    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;",
-    "SET TRANSACTION ISOLATION LEVEL READ COMMITTED;",
-    "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;",
-    "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;",
+std::string_view g_isolation_level[] = {
+    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;"sv,
+    "SET TRANSACTION ISOLATION LEVEL READ COMMITTED;"sv,
+    "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;"sv,
+    "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;"sv,
 };
 
-const char* g_consistent_snapshot[] = {
-    "START TRANSACTION;", "START TRANSACTION WITH CONSISTENT SNAPSHOT;",
+std::string_view g_consistent_snapshot[] = {
+    "START TRANSACTION;", "START TRANSACTION WITH CONSISTENT SNAPSHOT;"sv,
 };
 }
 
 transaction::transaction(connection* conn, isolation::level level, bool consistent_snapshot)
     : m_connection(conn) {
+
+
     conn->execute(g_isolation_level[level]);
     conn->execute(g_consistent_snapshot[consistent_snapshot]);
 }

@@ -13,6 +13,8 @@
 
 #include <string>
 #include <mariadb++/types.hpp>
+#include <utility>
+#include "containers.hpp"
 
 namespace mariadb {
 namespace exception {
@@ -23,10 +25,10 @@ class base : public std::exception {
     //
     base() throw() : std::exception(), m_error_id(0), m_error("Exception not defined") {}
 
-    base(u32 error_id, const std::string& error) throw()
-        : std::exception(), m_error_id(error_id), m_error(error) {}
+    base(u32 error_id, intercept::types::r_string error) throw()
+        : std::exception(), m_error_id(error_id), m_error(std::move(error)) {}
 
-    base(const std::string& error) throw() : std::exception(), m_error_id(0), m_error(error) {}
+    base(intercept::types::r_string error) throw() : std::exception(), m_error_id(0), m_error(std::move(error)) {}
 
     //
     // Destructor
@@ -42,7 +44,7 @@ class base : public std::exception {
 
    protected:
     u32 m_error_id;
-    std::string m_error;
+    intercept::types::r_string m_error;
 };
 
 class date_time : public base {
@@ -66,7 +68,8 @@ class connection : public base {
     //
     // Constructor
     //
-    connection(u32 error_id, const std::string& error) throw() : base(error_id, error) {}
+    connection(u32 error_id, intercept::types::r_string error) throw() : base(error_id, std::move(error)) {}
+    connection(u32 error_id, std::string_view error) throw() : base(error_id, error) {}
 };
 }
 }

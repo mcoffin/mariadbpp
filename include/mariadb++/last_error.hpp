@@ -12,6 +12,7 @@
 
 #include <string>
 #include "types.hpp"
+#include "containers.hpp"
 
 namespace mariadb {
 class last_error {
@@ -25,11 +26,11 @@ class last_error {
     // Get last error
     //
     u32 error_no() const;
-    const std::string& error() const;
+    const intercept::types::r_string& error() const;
 
    protected:
     u32 m_last_error_no;
-    std::string m_last_error;
+    intercept::types::r_string m_last_error;
 };
 }
 

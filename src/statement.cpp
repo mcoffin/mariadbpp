@@ -24,7 +24,7 @@ using namespace mariadb;
         return rs;                      \
     }
 
-statement::statement(connection* conn, const std::string& query)
+statement::statement(connection* conn, const intercept::types::r_string& query)
     : m_data(statement_data_ref(new statement_data(mysql_stmt_init(conn->m_mysql)))) {
     if (!m_data->m_statement)
         MYSQL_ERROR(conn->m_mysql)
@@ -110,11 +110,11 @@ MAKE_SETTER(time, const mariadb::time&)
 }
 
 MAKE_SETTER(decimal, const decimal&)
-    std::string str = value.str();
+    intercept::types::r_string str = value.str();
     bind.set(MYSQL_TYPE_STRING, str.c_str(), str.size());
 }
 
-MAKE_SETTER(string, const std::string&)
+MAKE_SETTER(string, const intercept::types::r_string&)
     bind.set(MYSQL_TYPE_STRING, value.c_str(), value.size());
 }
 

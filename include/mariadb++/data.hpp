@@ -14,6 +14,7 @@
 #include <string.h>
 #include <mariadb++/types.hpp>
 #include <iostream>
+#include "containers.hpp"
 
 namespace mariadb {
 template <typename Type>
@@ -95,9 +96,9 @@ class data {
     //
     // Convert data to a valid string
     //
-    std::string string() const {
-        std::string str;
-        if (m_size) str.append((const char*)m_data, m_size);
+    intercept::types::r_string string() const {
+        intercept::types::r_string str;
+        if (m_size) str.append(std::string_view(static_cast<const char*>(m_data), m_size));
         return str;
     }
 
@@ -169,6 +170,6 @@ class data {
 
 typedef std::shared_ptr< ::mariadb::data<char> > data_ref;
 typedef std::basic_iostream< ::mariadb::data<char> > data_stream;
-}
+}  // namespace mariadb
 
 #endif

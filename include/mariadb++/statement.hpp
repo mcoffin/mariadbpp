@@ -75,7 +75,7 @@ class statement : public last_error {
     MAKE_SETTER_DECL(time, const time&);
     MAKE_SETTER_DECL(data, const data_ref&);
     MAKE_SETTER_DECL(decimal, const decimal&);
-    MAKE_SETTER_DECL(string, const std::string&);
+    MAKE_SETTER_DECL(string, const intercept::types::r_string&);
     MAKE_SETTER_DECL(enum, const char*);
     MAKE_SETTER_DECL(boolean, bool);
     MAKE_SETTER_DECL(unsigned8, u8);
@@ -94,7 +94,7 @@ class statement : public last_error {
     /**
      * Private constructor used by connection
      */
-    statement(connection* conn, const std::string& query);
+    statement(connection* conn, const intercept::types::r_string& query);
 
    private:
     // reference to parent connection

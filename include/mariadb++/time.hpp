@@ -67,7 +67,7 @@ class time {
      *
      * @param t String containing time representation
      */
-    time(const std::string& t);
+    time(const intercept::types::r_string& t);
 
     /**
      * Compare this instance to given instance
@@ -264,7 +264,7 @@ class time {
      *
      * @return String representing time with optional milliseconds
      */
-    const std::string str_time(bool with_millisecond = false) const;
+    const intercept::types::r_string str_time(bool with_millisecond = false) const;
 
     /**
      * Uses time.h to determine the current time in the local timezone.

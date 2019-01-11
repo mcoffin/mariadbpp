@@ -14,6 +14,7 @@
 #include <map>
 #include <mariadb++/types.hpp>
 #include <mysql.h>
+#include "containers.hpp"
 
 namespace mariadb {
 class account;
@@ -27,7 +28,7 @@ class option_arg {
 #define MAKE_OPTION_ARG(name, type, return_value)                   \
 class option_arg_##name : public option_arg {                       \
    public:                                                          \
-    explicit option_arg_##name(const type &arg) : m_value(arg) { }  \
+    explicit option_arg_##name(type arg) : m_value(std::move(arg)) { }  \
     const void *value() override { return return_value; }           \
    protected:                                                       \
     type m_value;                                                   \
@@ -35,7 +36,7 @@ class option_arg_##name : public option_arg {                       \
 
 MAKE_OPTION_ARG(bool, bool, &m_value);
 MAKE_OPTION_ARG(int, int, &m_value);
-MAKE_OPTION_ARG(string, std::string, m_value.c_str());
+MAKE_OPTION_ARG(string, intercept::types::r_string, m_value.c_str());
 
 /**
  * Class used to store account and connection information used by mariadb::connection when
@@ -44,7 +45,7 @@ MAKE_OPTION_ARG(string, std::string, m_value.c_str());
  */
 class account {
    public:
-    typedef std::map<std::string, std::string> map_options_t;
+    typedef std::map<intercept::types::r_string, intercept::types::r_string> map_options_t;
     typedef std::map<mysql_option, std::unique_ptr<option_arg>> map_connect_options_t;
 
    public:
@@ -56,48 +57,48 @@ class account {
     /**
      * Gets the name of the host to connect to
      */
-    const std::string &host_name() const;
+    const intercept::types::r_string &host_name() const;
 
     /**
      * Gets the username to log in with
      */
-    const std::string &user_name() const;
+    const intercept::types::r_string &user_name() const;
 
     /**
      * Gets the password of the user to log in with
      */
-    const std::string &password() const;
+    const intercept::types::r_string &password() const;
 
     /**
      * Gets the unix socket path to connect to.
      * If this option is set, host and port will be ignored
      */
-    const std::string &unix_socket() const;
+    const intercept::types::r_string &unix_socket() const;
 
     /**
      * Gets the path to the key file
      */
-    const std::string &ssl_key() const;
+    const intercept::types::r_string &ssl_key() const;
 
     /**
      * Gets the path to the certificate file
      */
-    const std::string &ssl_certificate() const;
+    const intercept::types::r_string &ssl_certificate() const;
 
     /**
      * Gets the path to the certificate authority file
      */
-    const std::string &ssl_ca() const;
+    const intercept::types::r_string &ssl_ca() const;
 
     /**
-     * Gets the path to the directory containing CA files
+     * Gets the path to the directory containing CA intercept::types::r_string
      */
-    const std::string &ssl_ca_path() const;
+    const intercept::types::r_string &ssl_ca_path() const;
 
     /**
      * Gets the list of allowed SSL ciphers
      */
-    const std::string &ssl_cipher() const;
+    const intercept::types::r_string &ssl_cipher() const;
 
     /**
      * Gets the port to connect to
@@ -107,24 +108,24 @@ class account {
     /**
      * Gets the name of the database to open on connect
      */
-    const std::string &schema() const;
+    const intercept::types::r_string &schema() const;
 
     /**
      * Sets the name of the database to open on connect
      */
-    void set_schema(const std::string &schema);
+    void set_schema(const intercept::types::r_string &schema);
 
     /**
-     * Set SSL options. All files should be PEM format
+     * Set SSL options. All intercept::types::r_string should be PEM format
      *
      * @param key           Path to the key file
      * @param certificate   Path to the certificate file
      * @param ca            Path to the certificate authority file
-     * @param ca_path       Path to a directory containing CA files
+     * @param ca_path       Path to a directory containing CA intercept::types::r_string
      * @param cipher        List of allowed SSL ciphers. See MariaDB manual for possible values
      */
-    void set_ssl(const std::string &key, const std::string &certificate, const std::string &ca,
-                 const std::string &ca_path, const std::string &cipher);
+    void set_ssl(const intercept::types::r_string &key, const intercept::types::r_string &certificate, const intercept::types::r_string &ca,
+                 const intercept::types::r_string &ca_path, const intercept::types::r_string &cipher);
 
     /**
      * Gets the current state of the auto_commit option. This option is turned on by default.
@@ -141,7 +142,7 @@ class account {
      *
      * @return Value of the found option or empty string if not found
      */
-    const std::string option(const std::string &name) const;
+    const intercept::types::r_string option(const intercept::types::r_string &name) const;
 
     /**
      * Gets a map of all option key/value pairs previously set
@@ -151,7 +152,7 @@ class account {
     /**
      * Sets a named option key/value pair
      */
-    void set_option(const std::string &name, const std::string &value);
+    void set_option(const intercept::types::r_string &name, const intercept::types::r_string &value);
 
     /**
      * Deletes all stored key/value pairs of named options
@@ -174,7 +175,7 @@ class account {
     /**
      * Sets a connect option key/value pair with string argument
      */
-    void set_connect_option(mysql_option option, const std::string &arg);
+    void set_connect_option(mysql_option option, intercept::types::r_string arg);
 
     /**
      * Deletes all stored key/value pairs of named options
@@ -192,29 +193,29 @@ class account {
      * @param unix_sock Path of unix socket to connect to. If specified, host and port will be
      * ignored
      */
-    static account_ref create(const std::string &host_name, const std::string &user_name,
-                              const std::string &password, const std::string &schema = "",
-                              u32 port = 3306, const std::string &unix_socket = "");
+    static account_ref create(intercept::types::r_string host_name, intercept::types::r_string user_name,
+                              intercept::types::r_string password, intercept::types::r_string schema= {},
+                              u32 port = 3306, intercept::types::r_string unix_socket = {});
 
    private:
     /**
      * Private account constructor
      */
-    account(const std::string &host_name, const std::string &user_name, const std::string &password,
-            const std::string &schema, u32 port, const std::string &unix_sock);
+    account(intercept::types::r_string host_name, intercept::types::r_string user_name, intercept::types::r_string password,
+            intercept::types::r_string schema, u32 port, intercept::types::r_string unix_sock);
 
     bool m_auto_commit = true;
     u32 m_port;
-    std::string m_host_name;
-    std::string m_user_name;
-    std::string m_password;
-    std::string m_schema;
-    std::string m_unix_socket;
-    std::string m_ssl_key;
-    std::string m_ssl_certificate;
-    std::string m_ssl_ca;
-    std::string m_ssl_ca_path;
-    std::string m_ssl_cipher;
+    intercept::types::r_string m_host_name;
+    intercept::types::r_string m_user_name;
+    intercept::types::r_string m_password;
+    intercept::types::r_string m_schema;
+    intercept::types::r_string m_unix_socket;
+    intercept::types::r_string m_ssl_key;
+    intercept::types::r_string m_ssl_certificate;
+    intercept::types::r_string m_ssl_ca;
+    intercept::types::r_string m_ssl_ca_path;
+    intercept::types::r_string m_ssl_cipher;
     map_options_t m_options;
     map_connect_options_t m_connect_options;
 };

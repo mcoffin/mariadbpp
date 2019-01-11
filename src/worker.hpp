@@ -31,7 +31,7 @@ class worker {
     //
     worker();
     worker(account_ref& account, handle hnd, bool keep_handle, command::type command,
-           const std::string& query);
+           const intercept::types::r_string& query);
     worker(account_ref& account, handle hnd, bool keep_handle, command::type command,
            statement_ref& statement);
 
@@ -59,7 +59,7 @@ class worker {
     status::type m_status;
     command::type m_command;
     u64 m_result;
-    std::string m_query;
+    intercept::types::r_string m_query;
     account_ref m_account;
     result_set_ref m_result_set;
     statement_ref m_statement;

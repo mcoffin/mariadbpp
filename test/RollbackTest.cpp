@@ -66,7 +66,7 @@ TEST_F(RollbackTest, testSavePointNoCommit) {
 }
 
 TEST_F(RollbackTest, testMultiInsertIntegration) {
-    std::string queries[] = {
+    intercept::types::r_string queries[] = {
         "INSERT INTO " + m_table_name + " (data) VALUES(?);",
         "INSERT INTO " + m_table_name + " (data, str) VALUES(?, ?);",
         "INSERT INTO " + m_table_name + " (data, str, dt) VALUES(?, ?, ?);",

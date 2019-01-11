@@ -68,7 +68,7 @@ class connection : public last_error {
      *
      * @return String containing the schema
      */
-    const std::string& schema() const;
+    const intercept::types::r_string& schema() const;
 
     /**
      * Sets the schema (database name).
@@ -77,14 +77,14 @@ class connection : public last_error {
      * @param schema The new schema name
      * @return True on success
      */
-    bool set_schema(const std::string& schema);
+    bool set_schema(const intercept::types::r_string& schema);
 
     /**
      * Gets the charset associated with this connection
      *
      * @return String containg the charset (see documentation of MariaDB for possible values)
      */
-    const std::string& charset() const;
+    const intercept::types::r_string& charset() const;
 
     /**
      * Sets the charset.
@@ -93,7 +93,7 @@ class connection : public last_error {
      * @param value The new charset
      * @return True on success
      */
-    bool set_charset(const std::string& value);
+    bool set_charset(const intercept::types::r_string& value);
 
     /**
      * Execute a query without interest in a result.
@@ -102,7 +102,7 @@ class connection : public last_error {
      * @param query SQL query to execute
      * @return The number of actually affected rows. 0 on error
      */
-    u64 execute(const std::string& query);
+    u64 execute(const intercept::types::r_string& query);
 
     /**
      * Execute a query (usually, but not limited to INSERT) with interest for the last row id.
@@ -111,7 +111,7 @@ class connection : public last_error {
      * @param query SQL query to execute
      * @return Last row id of the inserted row. 0 on error
      */
-    u64 insert(const std::string& query);
+    u64 insert(const intercept::types::r_string& query);
 
     /**
      * Execute a query with an result (if no result is returned, the result_set will be empty).
@@ -121,7 +121,7 @@ class connection : public last_error {
      * @param query SQL query to execute
      * @return Result of the query as result_set.
      */
-    result_set_ref query(const std::string& query);
+    result_set_ref query(const intercept::types::r_string& query);
 
     /**
      * Gets the status of the auto_commit setting.
@@ -153,7 +153,7 @@ class connection : public last_error {
      *
      * @return Reference to the created statement.
      */
-    statement_ref create_statement(const std::string& query);
+    statement_ref create_statement(const intercept::types::r_string& query);
 
     /**
      * Create a transaction. Any change to the database will be held back until you COMMIT the
@@ -193,9 +193,9 @@ class connection : public last_error {
     // state of auto_commit setting
     bool m_auto_commit;
     // name of current schema
-    std::string m_schema;
+    intercept::types::r_string m_schema;
     // current charset
-    std::string m_charset;
+    intercept::types::r_string m_charset;
     // currently used account
     account_ref m_account;
 };

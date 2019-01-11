@@ -30,9 +30,9 @@ connection_ref connection::create(const account_ref& account) {
 
 connection::~connection() { disconnect(); }
 
-const std::string& connection::schema() const { return m_schema; }
+const intercept::types::r_string& connection::schema() const { return m_schema; }
 
-bool connection::set_schema(const std::string& schema) {
+bool connection::set_schema(const intercept::types::r_string& schema) {
     if (!connect()) return false;
 
     if (mysql_select_db(m_mysql, schema.c_str())) MYSQL_ERROR_RETURN_FALSE(m_mysql);
@@ -41,9 +41,9 @@ bool connection::set_schema(const std::string& schema) {
     return true;
 }
 
-const std::string& connection::charset() const { return m_charset; }
+const intercept::types::r_string& connection::charset() const { return m_charset; }
 
-bool connection::set_charset(const std::string& value) {
+bool connection::set_charset(const intercept::types::r_string& value) {
     if (!connect()) return false;
 
     if (mysql_set_character_set(m_mysql, value.c_str())) MYSQL_ERROR_RETURN_FALSE(m_mysql);
@@ -111,7 +111,7 @@ bool connection::connect() {
     if (!set_auto_commit(m_account->auto_commit())) MYSQL_ERROR_DISCONNECT(m_mysql);
 
     if (!m_account->schema().empty()) {
-        if (!set_schema(m_account->schema().c_str())) MYSQL_ERROR_DISCONNECT(m_mysql);
+        if (!set_schema(m_account->schema())) MYSQL_ERROR_DISCONNECT(m_mysql);
     }
 
     //
@@ -134,7 +134,7 @@ void connection::disconnect() {
     m_mysql = nullptr;
 }
 
-result_set_ref connection::query(const std::string& query) {
+result_set_ref connection::query(const intercept::types::r_string& query) {
     result_set_ref rs;
 
     if (!connect()) return rs;
@@ -148,7 +148,7 @@ result_set_ref connection::query(const std::string& query) {
     return rs;
 }
 
-u64 connection::execute(const std::string& query) {
+u64 connection::execute(const intercept::types::r_string& query) {
     if (!connect()) return 0;
 
     u64 affected_rows = 0;
@@ -181,7 +181,7 @@ u64 connection::execute(const std::string& query) {
     return affected_rows;
 }
 
-u64 connection::insert(const std::string& query) {
+u64 connection::insert(const intercept::types::r_string& query) {
     if (!connect()) return 0;
 
     if (mysql_real_query(m_mysql, query.c_str(), query.size())) {
@@ -192,7 +192,7 @@ u64 connection::insert(const std::string& query) {
     return mysql_insert_id(m_mysql);
 }
 
-statement_ref connection::create_statement(const std::string& query) {
+statement_ref connection::create_statement(const intercept::types::r_string& query) {
     if (!connect()) return statement_ref();
 
     return statement_ref(new statement(this, query));

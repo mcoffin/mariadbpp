@@ -10,6 +10,8 @@
 #define MARIADBCLIENTPP_CONVERSION_HELPER_H
 
 #include <limits>
+#include <stdexcept>
+#include <charconv>
 
 #ifdef WIN32
 #undef max
@@ -24,80 +26,80 @@ inline T checked_cast(K value) {
 };
 
 template <typename T>
-inline T string_cast(const std::string &str) {
-    size_t endPos;
-    int parsedNumber = std::stoi(str, &endPos);
+inline T string_cast(const intercept::types::r_string &str) {
+    int parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
 
-    if (endPos != str.size()) return T();
+    if (p != str.data()+str.size()) return T();
 
     return checked_cast<T>(parsedNumber);
 }
 
 template <>
-inline unsigned long string_cast(const std::string &str) {
-    size_t endPos;
-    unsigned long parsedNumber = std::stoul(str, &endPos);
+inline unsigned long string_cast(const intercept::types::r_string &str) {
+    unsigned long parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
 
-    if (endPos != str.size()) return 0;
+    if (p != str.data()+str.size()) return 0;
 
     return parsedNumber;
 }
 
 template <>
-inline unsigned int string_cast(const std::string &str) {
+inline unsigned int string_cast(const intercept::types::r_string &str) {
     unsigned long parsedNumber = string_cast<unsigned long>(str);
 
     return checked_cast<unsigned int>(parsedNumber);
 }
 
 template <>
-inline unsigned long long string_cast(const std::string &str) {
-    size_t endPos;
-    unsigned long long parsedNumber = std::stoull(str, &endPos);
+inline unsigned long long string_cast(const intercept::types::r_string &str) {
+    unsigned long long parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
 
-    if (endPos != str.size()) return 0;
-
-    return parsedNumber;
-}
-
-template <>
-inline long long string_cast(const std::string &str) {
-    size_t endPos;
-    long long parsedNumber = std::stoll(str, &endPos);
-
-    if (endPos != str.size()) return 0;
+    if (p != str.data()+str.size()) return 0;
 
     return parsedNumber;
 }
 
 template <>
-inline double string_cast(const std::string &str) {
-    size_t endPos;
-    try {
-        double parsedNumber = std::stod(str, &endPos);
+inline long long string_cast(const intercept::types::r_string &str) {
+    long long parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
 
-        if (endPos != str.size()) return 0;
+    if (p != str.data()+str.size()) return 0;
 
-        return parsedNumber;
-    } catch (std::out_of_range &) {
+    return parsedNumber;
+}
+
+template <>
+inline double string_cast(const intercept::types::r_string &str) {
+    double parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
+
+    if (ec ==  std::errc::result_out_of_range) {
         // Not a Number double
         return std::numeric_limits<double>::quiet_NaN();
     }
+
+    if (p != str.data()+str.size()) return 0;
+
+    return parsedNumber;
 }
 
 template <>
-inline float string_cast(const std::string &str) {
-    size_t endPos;
-    try {
-        float parsedNumber = std::stof(str, &endPos);
+inline float string_cast(const intercept::types::r_string &str) {
+    float parsedNumber;
+    auto [p, ec] = std::from_chars(str.data(), str.data()+str.size(), parsedNumber);
 
-        if (endPos != str.size()) return 0;
-
-        return parsedNumber;
-    } catch (std::out_of_range &) {
+    if (ec ==  std::errc::result_out_of_range) {
         // Not a Number float
         return std::numeric_limits<float>::quiet_NaN();
     }
+
+    if (p != str.data()+str.size()) return 0;
+
+    return parsedNumber;
 }
 
 #endif  // MARIADBCLIENTPP_CONVERSION_HELPER_H

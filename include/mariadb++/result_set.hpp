@@ -19,7 +19,7 @@
 #include <mariadb++/decimal.hpp>
 #include <mariadb++/last_error.hpp>
 
-#define MAKE_GETTER_SIG_STR(nm, rtype, fq) rtype fq get_##nm(const std::string& name) const
+#define MAKE_GETTER_SIG_STR(nm, rtype, fq) rtype fq get_##nm(const intercept::types::r_string& name) const
 #define MAKE_GETTER_SIG_INT(nm, rtype, fq) rtype fq get_##nm(u32 index) const
 
 #define MAKE_GETTER_DECL(nm, rtype)   \
@@ -70,7 +70,7 @@ class result_set : public last_error {
     friend class connection;
     friend class statement;
 
-    typedef std::map<std::string, u32> map_indexes_t;
+    typedef std::map<intercept::types::r_string, u32> map_indexes_t;
 
    public:
     /**
@@ -91,7 +91,7 @@ class result_set : public last_error {
      * @param name Name of column to look up
      * @return Index of column if found, maximum uint32 if not found
      */
-    u32 column_index(const std::string& name) const;
+    u32 column_index(const intercept::types::r_string& name) const;
 
     /**
      * Gets the type of a column by index
@@ -107,7 +107,7 @@ class result_set : public last_error {
      * @param index Index of the column to get the name for
      * @return String representing column name
      */
-    const std::string column_name(u32 index);
+    const intercept::types::r_string column_name(u32 index);
 
     /**
      * Gets the size of the data contained in the column at index
@@ -167,7 +167,7 @@ class result_set : public last_error {
     MAKE_GETTER_DECL(date_time, date_time);
     MAKE_GETTER_DECL(time, time);
     MAKE_GETTER_DECL(decimal, decimal);
-    MAKE_GETTER_DECL(string, std::string);
+    MAKE_GETTER_DECL(string, intercept::types::r_string);
     MAKE_GETTER_DECL(boolean, bool);
     MAKE_GETTER_DECL(unsigned8, u8);
     MAKE_GETTER_DECL(signed8, s8);
@@ -180,6 +180,14 @@ class result_set : public last_error {
     MAKE_GETTER_DECL(float, f32);
     MAKE_GETTER_DECL(double, f64);
     MAKE_GETTER_DECL(is_null, bool);
+
+
+    u32 get_affected_rows() {
+        return m_affected_rows;
+    }
+    u64 get_last_insert_id() {
+        return m_last_insert_id;
+    }
 
    private:
     /**
@@ -215,6 +223,14 @@ class result_set : public last_error {
     u32 m_field_count;
     // indicates if a row was fetched using next()
     bool m_has_result;
+
+
+
+    u32 m_affected_rows;
+
+    u64 m_last_insert_id;
+
+
 };
 
 typedef std::shared_ptr<result_set> result_set_ref;

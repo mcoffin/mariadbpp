@@ -49,7 +49,7 @@ mariadb::time::time(const time_t& t) {
 
 mariadb::time::time(const MYSQL_TIME& t) { set(t.hour, t.minute, t.second, t.second_part / 1000); }
 
-mariadb::time::time(const std::string& t) { set(t); }
+mariadb::time::time(const intercept::types::r_string& t) { set(static_cast<std::string>(t)); }
 
 int mariadb::time::compare(const time& t) const {
     if (hour() < t.hour()) return -1;
@@ -353,7 +353,7 @@ bool mariadb::time::set(const std::string& t) {
     throw std::invalid_argument("invalid time format");
 }
 
-const std::string mariadb::time::str_time(bool with_millisecond) const {
+const intercept::types::r_string mariadb::time::str_time(bool with_millisecond) const {
     std::stringstream stream;
     stream.fill('0');
 
@@ -367,7 +367,7 @@ const std::string mariadb::time::str_time(bool with_millisecond) const {
 
     if (with_millisecond) stream << "." << std::setw(3) << millisecond();
 
-    return stream.str();
+    return intercept::types::r_string(stream.str());
 }
 
 std::ostream& mariadb::operator<<(std::ostream& os, const time& t) {

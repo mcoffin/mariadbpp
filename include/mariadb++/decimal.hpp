@@ -16,9 +16,9 @@
 namespace mariadb {
 class decimal {
 public:
-    explicit decimal(std::string str = "") : mStr(std::move(str)) { }
+    explicit decimal(intercept::types::r_string str = {}) : mStr(std::move(str)) { }
 
-    std::string str() const {
+    intercept::types::r_string str() const {
         return mStr;
     }
 
@@ -31,7 +31,7 @@ public:
     }
 
 private:
-        std::string mStr;
+        intercept::types::r_string mStr;
 };
 }
 

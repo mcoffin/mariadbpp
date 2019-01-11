@@ -36,21 +36,21 @@ namespace concurrency {
     // Note: the void overloads are needed because it was too easy to "forget" passing keep_handle
     // and getting an invalid handle, instead we now return void when no handle is needed
     //
-    extern handle execute(const std::string& query, bool keep_handle);
-    inline void execute(const std::string& squery) { execute(squery, false); }
+    extern handle execute(const intercept::types::r_string& query, bool keep_handle);
+    inline void execute(const intercept::types::r_string& squery) { execute(squery, false); }
 
-    extern handle insert(const std::string& query, bool keep_handle);
-    inline void insert(const std::string& squery) { insert(squery, false); }
+    extern handle insert(const intercept::types::r_string& query, bool keep_handle);
+    inline void insert(const intercept::types::r_string& squery) { insert(squery, false); }
 
-    extern handle query(const std::string& query, bool keep_handle);
-    inline void query(const std::string& squery) { query(squery, false); }
+    extern handle query(const intercept::types::r_string& query, bool keep_handle);
+    inline void query(const intercept::types::r_string& squery) { query(squery, false); }
 
     //
     // Execute a query using a statement
     // Note: the void overloads are needed because it was too easy to "forget" passing keep_handle
     // and getting an invalid handle, instead we now return void when no handle is needed
     //
-    extern statement_ref create_statement(const std::string& query);
+    extern statement_ref create_statement(const intercept::types::r_string& query);
     extern handle execute(statement_ref& statement, bool keep_handle);
     inline void execute(statement_ref& statement) { execute(statement, false); }
 

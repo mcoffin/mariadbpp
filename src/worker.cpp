@@ -25,7 +25,7 @@ worker::worker()
       m_result(0) {}
 
 worker::worker(account_ref& account, handle handle, bool keep_handle, command::type command,
-               const std::string& query)
+               const intercept::types::r_string& query)
     : m_keep_handle(keep_handle),
       m_handle(handle),
       m_status(handle > 0 ? status::waiting : status::removed),
@@ -81,21 +81,21 @@ void worker::execute() {
                 if (m_statement)
                     m_result = m_statement->execute();
                 else
-                    m_result = connection->execute(m_query.c_str());
+                    m_result = connection->execute(m_query);
                 break;
 
             case command::insert:
                 if (m_statement)
                     m_result = m_statement->insert();
                 else
-                    m_result = connection->insert(m_query.c_str());
+                    m_result = connection->insert(m_query);
                 break;
 
             case command::query:
                 if (m_statement)
                     m_result_set = m_statement->query();
                 else
-                    m_result_set = connection->query(m_query.c_str());
+                    m_result_set = connection->query(m_query);
                 break;
         }
 

@@ -88,7 +88,7 @@ const worker& get_worker(handle h) {
 //
 // Add / remove a new query / command to the thread
 //
-handle add(const std::string& query, command::type command, bool keep_handle) {
+handle add(const intercept::types::r_string& query, command::type command, bool keep_handle) {
     LOCK_MUTEX();
     worker* w = new worker(g_account, ++g_next_handle, keep_handle, command, query);
     g_querys_in.push_back(w);
@@ -147,22 +147,22 @@ result_set_ref concurrency::get_query_result(handle h) {
 //
 // Execute a query
 //
-handle concurrency::execute(const std::string& query, bool keep_handle) {
+handle concurrency::execute(const intercept::types::r_string& query, bool keep_handle) {
     return add(query, command::execute, keep_handle);
 }
 
-handle concurrency::insert(const std::string& query, bool keep_handle) {
+handle concurrency::insert(const intercept::types::r_string& query, bool keep_handle) {
     return add(query, command::insert, keep_handle);
 }
 
-handle concurrency::query(const std::string& query, bool keep_handle) {
+handle concurrency::query(const intercept::types::r_string& query, bool keep_handle) {
     return add(query, command::query, keep_handle);
 }
 
 //
 // Execute a query using a statement
 //
-statement_ref concurrency::create_statement(const std::string& query) {
+statement_ref concurrency::create_statement(const intercept::types::r_string& query) {
     connection_ref connection = connection::create(g_account);
     statement_ref statement = connection->create_statement(query);
     statement->set_connection(connection);

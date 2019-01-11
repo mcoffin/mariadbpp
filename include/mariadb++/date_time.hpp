@@ -75,7 +75,7 @@ class date_time : public time {
      *
      * @param dt String containing ISO date
      */
-    date_time(const std::string& dt);
+    date_time(const intercept::types::r_string& dt);
 
     //
     // Operators
@@ -382,14 +382,14 @@ class date_time : public time {
      * @param with_millisecond Controls whether or not to print optional .nnn part
      * @return String containing ISO date and time
      */
-    const std::string str(bool with_millisecond = false) const;
+    const intercept::types::r_string str(bool with_millisecond = false) const;
 
     /**
      * Converts only the date part of this date_time to ISO 8601 date string yyyy-mm-dd
      *
      * @return String containing ISO date
      */
-    const std::string str_date() const;
+    const intercept::types::r_string str_date() const;
 
    private:
     u16 m_year;
