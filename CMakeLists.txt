@@ -62,7 +62,7 @@ SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nobody")
 INCLUDE(CPack)
 
 # tests
-add_subdirectory(test)
+#add_subdirectory(test)
 
 # doxygen
 include(Doxygen)
