@@ -65,7 +65,7 @@ INCLUDE(CPack)
 #add_subdirectory(test)
 
 # doxygen
-include(Doxygen)
-if (DOXYGEN_FOUND)
-	setup_doxygen(mariadbpp_doc ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-endif()
+#include(Doxygen)
+#if (DOXYGEN_FOUND)
+#	setup_doxygen(mariadbpp_doc ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+#endif()
