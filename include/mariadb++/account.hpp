@@ -14,7 +14,7 @@
 #include <map>
 #include <mariadb++/types.hpp>
 #include <mysql.h>
-#include "containers.hpp"
+#include "shared/types.hpp"
 
 namespace mariadb {
 class account;
@@ -197,6 +197,15 @@ class account {
                               intercept::types::r_string password, intercept::types::r_string schema= {},
                               u32 port = 3306, intercept::types::r_string unix_socket = {});
 
+    void addErrorHandler(intercept::types::game_value handler) {
+        errorHandlers.emplace_back(std::move(handler));
+    }
+
+    bool hasErrorHandler() const { return !errorHandlers.empty(); }
+
+    const auto& getErrorHandlers() const { return errorHandlers; }
+
+
    private:
     /**
      * Private account constructor
@@ -218,6 +227,9 @@ class account {
     intercept::types::r_string m_ssl_cipher;
     map_options_t m_options;
     map_connect_options_t m_connect_options;
+
+    std::vector<intercept::types::game_value> errorHandlers;
+
 };
 }
 
