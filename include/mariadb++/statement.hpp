@@ -68,6 +68,9 @@ class statement : public last_error {
      */
     void set_connection(connection_ref& connection);
 
+    size_t get_bind_count() const;
+
+
     // declare all setters
     MAKE_SETTER_DECL(blob, stream_ref);
     MAKE_SETTER_DECL(date_time, const date_time&);

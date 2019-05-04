@@ -44,6 +44,8 @@ statement::statement(connection* conn, const intercept::types::r_string& query)
 
 void statement::set_connection(connection_ref& connection) { m_connection = connection; }
 
+size_t statement::get_bind_count() const { return m_data->m_bind_count; }
+
 u64 statement::execute() {
     if (m_data->m_raw_binds && mysql_stmt_bind_param(m_data->m_statement, m_data->m_raw_binds))
         STMT_ERROR_RETURN_FALSE(m_data->m_statement);
@@ -161,7 +163,7 @@ MAKE_SETTER(signed64, s64)
     bind.set(MYSQL_TYPE_LONGLONG);
 }
 
-MAKE_SETTER(float, f32)
+void statement:: set_float(u32 index, f32 value) { if (index >= m_data->m_bind_count) throw std::out_of_range("Field index out of range"); bind& bind = *m_data->m_binds.at(index);
     bind.m_float32[0] = value;
     bind.set(MYSQL_TYPE_FLOAT);
 }
