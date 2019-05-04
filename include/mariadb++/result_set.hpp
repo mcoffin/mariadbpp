@@ -162,6 +162,7 @@ class result_set : public last_error {
 
     // declare all getters
     MAKE_GETTER_DECL(blob, stream_ref);
+    MAKE_GETTER_DECL(blobString, intercept::types::r_string);
     MAKE_GETTER_DECL(data, data_ref);
     MAKE_GETTER_DECL(date, date_time);
     MAKE_GETTER_DECL(date_time, date_time);

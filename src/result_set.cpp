@@ -287,6 +287,13 @@ MAKE_GETTER(blob, stream_ref, value::type::blob)
     return stream_ref(ss);
 }
 
+MAKE_GETTER(blobString, intercept::types::r_string, value::type::blob)
+    size_t len = column_size(index);
+
+    if (len == 0) return {};
+    return intercept::types::r_string(std::string_view(m_row[index], len));
+}
+
 MAKE_GETTER(data, data_ref, value::type::data)
     size_t len = column_size(index);
 
