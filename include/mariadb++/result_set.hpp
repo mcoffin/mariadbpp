@@ -83,7 +83,7 @@ class result_set : public last_error {
      *
      * @return Count of columns
      */
-    u64 column_count() const;
+    u32 column_count() const;
 
     /**
      * Get the index of a column by column-name (case sensitive)
@@ -100,6 +100,9 @@ class result_set : public last_error {
      * @return Type enum indicating column type
      */
     value::type column_type(u32 index) const;
+
+
+    enum_field_types column_type_raw(u32 index) const;
 
     /**
      * Gets the name of a column by index

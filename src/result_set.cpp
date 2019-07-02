@@ -93,7 +93,7 @@ result_set::~result_set() {
     }
 }
 
-u64 result_set::column_count() const { return m_field_count; }
+u32 result_set::column_count() const { return m_field_count; }
 
 value::type result_set::column_type(u32 index) const {
     if (index >= m_field_count) throw std::out_of_range("Column index out of range");
@@ -157,6 +157,12 @@ value::type result_set::column_type(u32 index) const {
         case MYSQL_TYPE_STRING:
             return value::string;
     }
+}
+
+enum_field_types result_set::column_type_raw(u32 index) const {
+    if (index >= m_field_count) throw std::out_of_range("Column index out of range");
+
+    return m_fields[index].type;
 }
 
 const intercept::types::r_string result_set::column_name(u32 index) {
