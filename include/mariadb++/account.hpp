@@ -22,6 +22,7 @@ typedef std::shared_ptr<account> account_ref;
 
 class option_arg {
    public:
+    virtual ~option_arg() = default;
     virtual const void *value() = 0;
 };
 

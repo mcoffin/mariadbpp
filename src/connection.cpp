@@ -14,11 +14,12 @@
 
 using namespace mariadb;
 
-#define MYSQL_ERROR_DISCONNECT(mysql) \
-    {                                 \
-        MYSQL_ERROR_NO_BRAKET(mysql)  \
-        disconnect();                 \
-        return false;                 \
+#define MYSQL_ERROR_DISCONNECT(mysql)                 \
+    {                                                 \
+        m_last_error_no = mysql_errno(mysql);         \
+        m_last_error = mysql_error(mysql);            \
+        disconnect();                                 \
+        MARIADB_ERROR(m_last_error_no, m_last_error); \
     }
 
 connection::connection(const account_ref& account)
@@ -35,7 +36,7 @@ const intercept::types::r_string& connection::schema() const { return m_schema; 
 bool connection::set_schema(const intercept::types::r_string& schema) {
     if (!connect()) return false;
 
-    if (mysql_select_db(m_mysql, schema.c_str())) MYSQL_ERROR_RETURN_FALSE(m_mysql);
+    if (mysql_select_db(m_mysql, schema.c_str())) MYSQL_ERROR(m_mysql);
 
     m_schema = schema;
     return true;
@@ -46,7 +47,7 @@ const intercept::types::r_string& connection::charset() const { return m_charset
 bool connection::set_charset(const intercept::types::r_string& value) {
     if (!connect()) return false;
 
-    if (mysql_set_character_set(m_mysql, value.c_str())) MYSQL_ERROR_RETURN_FALSE(m_mysql);
+    if (mysql_set_character_set(m_mysql, value.c_str())) MYSQL_ERROR(m_mysql);
 
     m_charset = value;
     return true;
@@ -68,7 +69,7 @@ bool connection::set_auto_commit(bool auto_commit) {
 
     if (!connect()) return false;
 
-    if (mysql_autocommit(m_mysql, auto_commit)) MYSQL_ERROR_RETURN_FALSE(m_mysql);
+    if (mysql_autocommit(m_mysql, auto_commit)) MYSQL_ERROR(m_mysql);
 
     m_auto_commit = auto_commit;
     return true;
@@ -82,7 +83,6 @@ bool connection::connect() {
 
         if (!m_mysql) {
             MARIADB_ERROR(0, "Cannot create MYSQL object.");
-            return false;
         }
     }
 
@@ -90,7 +90,7 @@ bool connection::connect() {
         if (mysql_ssl_set(m_mysql, m_account->ssl_key().c_str(),
                           m_account->ssl_certificate().c_str(), m_account->ssl_ca().c_str(),
                           m_account->ssl_ca_path().c_str(), m_account->ssl_cipher().c_str()))
-            MYSQL_ERROR_RETURN_FALSE(m_mysql);
+            MYSQL_ERROR(m_mysql);
     }
 
     //
@@ -106,7 +106,7 @@ bool connection::connect() {
             m_account->password().c_str(), nullptr, m_account->port(),
             m_account->unix_socket().empty() ? nullptr : m_account->unix_socket().c_str(),
             CLIENT_MULTI_STATEMENTS))
-        MYSQL_ERROR_RETURN_FALSE(m_mysql);
+        MYSQL_ERROR(m_mysql);
 
     if (!set_auto_commit(m_account->auto_commit())) MYSQL_ERROR_DISCONNECT(m_mysql);
 
@@ -141,7 +141,6 @@ result_set_ref connection::query(const intercept::types::r_string& query) {
 
     if (mysql_real_query(m_mysql, query.c_str(), query.size())) {
         MYSQL_ERROR_NO_BRAKET(m_mysql);
-        return rs;
     }
 
     rs.reset(new result_set(this));
@@ -155,7 +154,6 @@ u64 connection::execute(const intercept::types::r_string& query) {
 
     if (mysql_real_query(m_mysql, query.c_str(), query.size())) {
         MYSQL_ERROR_NO_BRAKET(m_mysql);
-        return affected_rows;
     }
 
     int status;
@@ -168,13 +166,11 @@ u64 connection::execute(const intercept::types::r_string& query) {
             affected_rows += mysql_affected_rows(m_mysql);
         else {
             MYSQL_ERROR_NO_BRAKET(m_mysql);
-            return affected_rows;
         }
 
         status = mysql_next_result(m_mysql);
         if (status > 0) {
             MYSQL_ERROR_NO_BRAKET(m_mysql);
-            return affected_rows;
         }
     } while (status == 0);
 
@@ -186,7 +182,6 @@ u64 connection::insert(const intercept::types::r_string& query) {
 
     if (mysql_real_query(m_mysql, query.c_str(), query.size())) {
         MYSQL_ERROR_NO_BRAKET(m_mysql);
-        return 0;
     }
 
     return mysql_insert_id(m_mysql);

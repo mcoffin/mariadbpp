@@ -6,6 +6,9 @@
 cmake_minimum_required(VERSION 3.1)
 project(mariadbclientpp)
 
+option(MARIADBPP_TEST "Build mariadbpp tests" OFF)
+option(MARIADBPP_DOC "Build mariadbpp docs" OFF)
+
 # add additional cmake modules
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/external/cmake-modules")
 
@@ -62,10 +65,14 @@ SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nobody")
 INCLUDE(CPack)
 
 # tests
-#add_subdirectory(test)
+if (MARIADBPP_TEST)
+	add_subdirectory(test)
+endif()
 
-# doxygen
-#include(Doxygen)
-#if (DOXYGEN_FOUND)
-#	setup_doxygen(mariadbpp_doc ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-#endif()
+if (MARIADBPP_DOC)
+	# doxygen
+	include(Doxygen)
+	if (DOXYGEN_FOUND)
+		setup_doxygen(mariadbpp_doc ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+	endif()
+endif()
