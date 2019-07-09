@@ -79,7 +79,6 @@ class statement : public last_error {
     MAKE_SETTER_DECL(data, const data_ref&);
     MAKE_SETTER_DECL(decimal, const decimal&);
     MAKE_SETTER_DECL(string, const intercept::types::r_string&);
-    MAKE_SETTER_DECL(enum, const char*);
     MAKE_SETTER_DECL(boolean, bool);
     MAKE_SETTER_DECL(unsigned8, u8);
     MAKE_SETTER_DECL(signed8, s8);
