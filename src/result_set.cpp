@@ -31,8 +31,8 @@ result_set::result_set(connection *conn)
     if (m_result_set) {
         m_field_count = mysql_num_fields(m_result_set);
         m_fields = mysql_fetch_fields(m_result_set);
-        m_affected_rows = mysql_affected_rows(connection->m_mysql);
-        m_last_insert_id =  mysql_insert_id(connection->m_mysql);
+        m_affected_rows = mysql_affected_rows(conn->m_mysql);
+        m_last_insert_id =  mysql_insert_id(conn->m_mysql);
 
         for (u32 i = 0; i < m_field_count; ++i) m_indexes[intercept::types::r_string(m_fields[i].name)] = i;
     }

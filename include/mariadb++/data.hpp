@@ -11,10 +11,10 @@
 #ifndef _MARIADB_DATA_HPP_
 #define _MARIADB_DATA_HPP_
 
-#include <string.h>
+#include <string>
 #include <mariadb++/types.hpp>
 #include <iostream>
-#include "containers.hpp"
+#include <containers.hpp>
 
 namespace mariadb {
 template <typename Type>
