@@ -18,7 +18,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # dependencies
-#find_package(mariadbclient REQUIRED)
+find_package(MariaDBClient REQUIRED)
+find_package(Threads REQUIRED)
 
 
 SET(MariaDBClient_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/mariadb-connector-c/include")
@@ -45,9 +46,9 @@ file(GLOB mariadbclientpp_SOURCES src/*.cpp)
 add_library(mariadbclientpp ${mariadbclientpp_SOURCES} ${mariadbclientpp_PUBLIC_HEADERS} ${mariadbclientpp_PRIVATE_HEADERS})
 
 # target options
-target_link_libraries(mariadbclientpp mariadbclient)
-#TODO pthread on linux
-target_include_directories(mariadbclientpp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${MariaDBClient_INCLUDE_DIRS} ${INTERCEPT_INCLUDE_PATH})
+target_link_libraries(mariadbclientpp ${MariaDBClient_LIBRARIES} Threads::Threads)
+target_include_directories(mariadbclientpp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${MariaDBClient_INCLUDE_DIRS})
+target_compile_options(mariadbclientpp PRIVATE -Wall -Wextra)
 
 # install configuration
 install(FILES ${mariadbclientpp_PUBLIC_HEADERS} DESTINATION include/mariadb++)

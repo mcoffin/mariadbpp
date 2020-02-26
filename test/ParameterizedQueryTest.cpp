@@ -47,6 +47,8 @@ TEST_F(ParameterizedQueryTest, bindAnyDataType) {
     mariadb::statement_ref testQuery;
     mariadb::result_set_ref queryResult;
 
+    m_con->create_statement("SET sql_mode = 'STRICT_TRANS_TABLES';")->execute();
+
 #define ParamTest_TEST(call, call2, name, value)                                                  \
     errorQuery = m_con->create_statement("UPDATE " + m_table_name + " SET " + name + "= ?;");     \
     call;                                                                                         \
@@ -65,6 +67,10 @@ TEST_F(ParameterizedQueryTest, bindAnyDataType) {
                    "preis", 299);
     ParamTest_TEST(errorQuery->set_string(0, "TESTSTRING"), queryResult->get_string(0), "str",
                    "TESTSTRING");
+    ParamTest_TEST(errorQuery->set_null(0), queryResult->get_string(0), "str", "");
+    ParamTest_TEST(errorQuery->set_null(0), queryResult->get_is_null(0), "str", true);
+    EXPECT_ANY_THROW(ParamTest_TEST(errorQuery->set_null(0), queryResult->get_string(0), "nnstr", ""));
+    ParamTest_TEST(errorQuery->set_string(0, ""), queryResult->get_string(0), "nnstr", "");
     ParamTest_TEST(errorQuery->set_boolean(0, true), queryResult->get_boolean(0), "b", true);
     ParamTest_TEST(errorQuery->set_double(0, 0.03), queryResult->get_double(0), "dd", 0.03);
     ParamTest_TEST(errorQuery->set_double(0, -0.03), queryResult->get_double(0), "dd", -0.03);

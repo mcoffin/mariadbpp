@@ -63,6 +63,10 @@ bool account::auto_commit() const { return m_auto_commit; }
 
 void account::set_auto_commit(bool auto_commit) { m_auto_commit = auto_commit; }
 
+bool account::store_result() const { return m_store_result; }
+
+void account::set_store_result(bool store_result) { m_store_result = store_result; }
+
 const account::map_options_t &account::options() const { return m_options; }
 
 const intercept::types::r_string account::option(const intercept::types::r_string &name) const {
